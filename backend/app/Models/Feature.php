@@ -3,6 +3,7 @@
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Spatie\Translatable\HasTranslations;
 
 class Feature extends Model
@@ -13,9 +14,11 @@ class Feature extends Model
         'name',
     ];
     
-    public function properties()
+    protected $fillable = ['name'];
+
+    public function properties(): BelongsToMany
     {
-        return $this->belongsToMany(Property::class, 'feature_property')
-                    ->withPivot('sort_order');
+        return $this->belongsToMany(Property::class)
+            ->withPivot('sort_order');
     }
 }

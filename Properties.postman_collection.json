@@ -1,0 +1,282 @@
+{
+  "info": {
+    "name": "Estatein — Properties API",
+    "description": "Public + Admin property endpoints. Set collection variables: base_url, token.",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "variable": [
+    { "key": "base_url", "value": "http://localhost:8000/api/v1" },
+    { "key": "token", "value": "" },
+    { "key": "property_id", "value": "1" },
+    { "key": "image_id", "value": "1" }
+  ],
+  "item": [
+    {
+      "name": "Auth",
+      "item": [
+        {
+          "name": "Admin Login",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "if (pm.response.code === 200) {",
+                  "  const json = pm.response.json();",
+                  "  if (json.token) pm.collectionVariables.set('token', json.token);",
+                  "}"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              { "key": "Accept", "value": "application/json" },
+              { "key": "Content-Type", "value": "application/json" }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"email\": \"admin@estatein.test\",\n  \"password\": \"password\"\n}"
+            },
+            "url": "{{base_url}}/admin/login"
+          }
+        },
+        {
+          "name": "Admin Me",
+          "request": {
+            "method": "GET",
+            "header": [
+              { "key": "Accept", "value": "application/json" },
+              { "key": "Authorization", "value": "Bearer {{token}}" }
+            ],
+            "url": "{{base_url}}/admin/me"
+          }
+        },
+        {
+          "name": "Admin Logout",
+          "request": {
+            "method": "POST",
+            "header": [
+              { "key": "Accept", "value": "application/json" },
+              { "key": "Authorization", "value": "Bearer {{token}}" }
+            ],
+            "url": "{{base_url}}/admin/logout"
+          }
+        }
+      ]
+    },
+    {
+      "name": "Public — Properties",
+      "item": [
+        {
+          "name": "List published properties",
+          "request": {
+            "method": "GET",
+            "header": [{ "key": "Accept", "value": "application/json" }],
+            "url": {
+              "raw": "{{base_url}}/properties?perPage=15&search=&type=&sort=sort_order&direction=asc&relations[]=images&relations[]=features",
+              "host": ["{{base_url}}"],
+              "path": ["properties"],
+              "query": [
+                { "key": "perPage", "value": "15" },
+                { "key": "search", "value": "" },
+                { "key": "type", "value": "" },
+                { "key": "bedrooms", "value": "", "disabled": true },
+                { "key": "bathrooms", "value": "", "disabled": true },
+                { "key": "sort", "value": "sort_order" },
+                { "key": "direction", "value": "asc" },
+                { "key": "relations[]", "value": "images" },
+                { "key": "relations[]", "value": "features" }
+              ]
+            }
+          }
+        },
+        {
+          "name": "Show published property",
+          "request": {
+            "method": "GET",
+            "header": [{ "key": "Accept", "value": "application/json" }],
+            "url": "{{base_url}}/properties/{{property_id}}"
+          }
+        }
+      ]
+    },
+    {
+      "name": "Admin — Properties",
+      "item": [
+        {
+          "name": "List all properties",
+          "request": {
+            "method": "GET",
+            "header": [
+              { "key": "Accept", "value": "application/json" },
+              { "key": "Authorization", "value": "Bearer {{token}}" }
+            ],
+            "url": {
+              "raw": "{{base_url}}/admin/properties?perPage=15&is_published=&search=&sort=created_at&direction=desc&relations[]=images&relations[]=features",
+              "host": ["{{base_url}}"],
+              "path": ["admin", "properties"],
+              "query": [
+                { "key": "perPage", "value": "15" },
+                { "key": "is_published", "value": "" },
+                { "key": "search", "value": "" },
+                { "key": "type", "value": "", "disabled": true },
+                { "key": "sort", "value": "created_at" },
+                { "key": "direction", "value": "desc" },
+                { "key": "relations[]", "value": "images" },
+                { "key": "relations[]", "value": "features" }
+              ]
+            }
+          }
+        },
+        {
+          "name": "Create property (JSON)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "if (pm.response.code === 201) {",
+                  "  const json = pm.response.json();",
+                  "  const id = json.data ? json.data.id : json.id;",
+                  "  if (id) pm.collectionVariables.set('property_id', String(id));",
+                  "}"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              { "key": "Accept", "value": "application/json" },
+              { "key": "Authorization", "value": "Bearer {{token}}" },
+              { "key": "Content-Type", "value": "application/json" }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"title\": {\n    \"en\": \"Seaside Serenity Villa\",\n    \"ar\": \"فيلا صفو البحر\"\n  },\n  \"description\": {\n    \"en\": \"A stunning 4-bedroom villa in a peaceful neighborhood.\",\n    \"ar\": \"فيلا رائعة من 4 غرف في حي هادئ.\"\n  },\n  \"location\": {\n    \"en\": \"Malibu, CA\",\n    \"ar\": \"ماليبو، كاليفورنيا\"\n  },\n  \"price\": 500000,\n  \"bedrooms\": 4,\n  \"bathrooms\": 3,\n  \"type\": \"Villa\",\n  \"is_published\": true,\n  \"sort_order\": 1,\n  \"feature_ids\": [1, 2]\n}"
+            },
+            "url": "{{base_url}}/admin/properties"
+          }
+        },
+        {
+          "name": "Create property (multipart + images)",
+          "request": {
+            "method": "POST",
+            "header": [
+              { "key": "Accept", "value": "application/json" },
+              { "key": "Authorization", "value": "Bearer {{token}}" }
+            ],
+            "body": {
+              "mode": "formdata",
+              "formdata": [
+                { "key": "title[en]", "value": "Metropolitan Haven", "type": "text" },
+                { "key": "title[ar]", "value": "ملاذ حضري", "type": "text" },
+                { "key": "description[en]", "value": "Chic 2-bedroom apartment with city views.", "type": "text" },
+                { "key": "description[ar]", "value": "شقة أنيقة من غرفتين بإطلالة على المدينة.", "type": "text" },
+                { "key": "location[en]", "value": "New York, NY", "type": "text" },
+                { "key": "location[ar]", "value": "نيويورك", "type": "text" },
+                { "key": "price", "value": "600000", "type": "text" },
+                { "key": "bedrooms", "value": "2", "type": "text" },
+                { "key": "bathrooms", "value": "2", "type": "text" },
+                { "key": "type", "value": "Apartment", "type": "text" },
+                { "key": "is_published", "value": "1", "type": "text" },
+                { "key": "feature_ids[]", "value": "1", "type": "text" },
+                { "key": "feature_ids[]", "value": "2", "type": "text" },
+                { "key": "images[]", "type": "file", "src": [] },
+                { "key": "images[]", "type": "file", "src": [] }
+              ]
+            },
+            "url": "{{base_url}}/admin/properties"
+          }
+        },
+        {
+          "name": "Show property",
+          "request": {
+            "method": "GET",
+            "header": [
+              { "key": "Accept", "value": "application/json" },
+              { "key": "Authorization", "value": "Bearer {{token}}" }
+            ],
+            "url": "{{base_url}}/admin/properties/{{property_id}}"
+          }
+        },
+        {
+          "name": "Update property (JSON)",
+          "request": {
+            "method": "PUT",
+            "header": [
+              { "key": "Accept", "value": "application/json" },
+              { "key": "Authorization", "value": "Bearer {{token}}" },
+              { "key": "Content-Type", "value": "application/json" }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"title\": {\n    \"en\": \"Seaside Serenity Villa (Updated)\",\n    \"ar\": \"فيلا صفو البحر (محدث)\"\n  },\n  \"price\": 525000,\n  \"is_published\": true,\n  \"feature_ids\": [1, 2, 3]\n}"
+            },
+            "url": "{{base_url}}/admin/properties/{{property_id}}"
+          }
+        },
+        {
+          "name": "Update property (multipart + new images)",
+          "request": {
+            "method": "POST",
+            "header": [
+              { "key": "Accept", "value": "application/json" },
+              { "key": "Authorization", "value": "Bearer {{token}}" }
+            ],
+            "body": {
+              "mode": "formdata",
+              "formdata": [
+                { "key": "_method", "value": "PUT", "type": "text" },
+                { "key": "price", "value": "530000", "type": "text" },
+                { "key": "is_published", "value": "1", "type": "text" },
+                { "key": "images[]", "type": "file", "src": [] }
+              ]
+            },
+            "url": "{{base_url}}/admin/properties/{{property_id}}"
+          }
+        },
+        {
+          "name": "Delete property",
+          "request": {
+            "method": "DELETE",
+            "header": [
+              { "key": "Accept", "value": "application/json" },
+              { "key": "Authorization", "value": "Bearer {{token}}" }
+            ],
+            "url": "{{base_url}}/admin/properties/{{property_id}}"
+          }
+        }
+      ]
+    },
+    {
+      "name": "Admin — Property Images",
+      "item": [
+        {
+          "name": "Set primary image",
+          "request": {
+            "method": "POST",
+            "header": [
+              { "key": "Accept", "value": "application/json" },
+              { "key": "Authorization", "value": "Bearer {{token}}" }
+            ],
+            "url": "{{base_url}}/admin/property-images/{{image_id}}/primary"
+          }
+        },
+        {
+          "name": "Delete image",
+          "request": {
+            "method": "DELETE",
+            "header": [
+              { "key": "Accept", "value": "application/json" },
+              { "key": "Authorization", "value": "Bearer {{token}}" }
+            ],
+            "url": "{{base_url}}/admin/property-images/{{image_id}}"
+          }
+        }
+      ]
+    }
+  ]
+}
