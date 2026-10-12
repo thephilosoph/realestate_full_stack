@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\Api\Admin\AuthController;
 use Illuminate\Support\Facades\Route;
 
 use App\Http\Controllers\Api\Admin\PropertyController as AdminPropertyController;
@@ -8,13 +9,23 @@ use App\Http\Controllers\Api\Public\PropertyController as PublicPropertyControll
 
 Route::prefix('v1')->group(function () {
 
-    
     Route::get('properties', [PublicPropertyController::class, 'index']);
     Route::get('properties/{id}', [PublicPropertyController::class, 'show']);
 
-    Route::prefix('admin')->middleware('auth:api')->group(function () {
-        Route::apiResource('properties', AdminPropertyController::class);
-        Route::delete('property-images/{id}', [PropertyImageController::class, 'destroy']);
-        Route::post('property-images/{id}/primary', [PropertyImageController::class, 'setPrimary']);
+    Route::prefix('admin')->group(function () {
+        Route::post('login', [AuthController::class, 'login']);
     });
+
+    Route::prefix('admin')
+        ->middleware('auth:sanctum')
+        ->group(function () {
+            Route::post('logout', [AuthController::class, 'logout']);
+            Route::post('logout-all', [AuthController::class, 'logoutAll']);
+            Route::get('me', [AuthController::class, 'me']);
+
+            Route::apiResource('properties', AdminPropertyController::class);
+
+            Route::delete('property-images/{id}', [PropertyImageController::class, 'destroy']);
+            Route::post('property-images/{id}/primary', [PropertyImageController::class, 'setPrimary']);
+        });
 });
