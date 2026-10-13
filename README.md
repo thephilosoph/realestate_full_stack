@@ -4,7 +4,7 @@ Bilingual (English / Arabic) real-estate website and admin API, based on the **P
 
 | Layer | Stack |
 |--------|--------|
-| **Frontend** | Vue 3 · TypeScript · Vite · Tailwind CSS · Pinia · Vue Query · Vue I18n · Vue Router |
+| **Frontend** | Vue 3 · TypeScript · Vite · Tailwind CSS · Pinia · TanStack Vue Query · Vue I18n · Vue Router |
 | **Backend** | Laravel · Sanctum · Spatie Translatable · Repository / Service pattern |
 | **Locales** | `en` / `ar` with RTL support on the public site |
 
@@ -14,16 +14,20 @@ Bilingual (English / Arabic) real-estate website and admin API, based on the **P
 
 1. [Requirements](#1-requirements)
 2. [Project structure](#2-project-structure)
-3. [Backend setup (Laravel)](#3-backend-setup-laravel)
-4. [Frontend setup (Vue)](#4-frontend-setup-vue)
-5. [Environment variables](#5-environment-variables)
-6. [Migrations](#6-migrations)
-7. [Seeders](#7-seeders)
-8. [Running the app](#8-running-the-app)
-9. [API overview](#9-api-overview)
-10. [Admin dashboard](#10-admin-dashboard)
-11. [Tests](#11-tests)
-12. [Common issues](#12-common-issues)
+3. [Features delivered](#3-features-delivered)
+4. [Backend setup (Laravel)](#4-backend-setup-laravel)
+5. [Frontend setup (Vue)](#5-frontend-setup-vue)
+6. [Environment variables](#6-environment-variables)
+7. [Migrations](#7-migrations)
+8. [Seeders](#8-seeders)
+9. [Running the app](#9-running-the-app)
+10. [API overview](#10-api-overview)
+11. [Admin dashboard](#11-admin-dashboard)
+12. [Security](#12-security)
+13. [Tests](#13-tests)
+14. [Performance notes](#14-performance-notes)
+15. [Common issues](#15-common-issues)
+16. [Related docs](#16-related-docs)
 
 ---
 
@@ -54,7 +58,7 @@ Bilingual (English / Arabic) real-estate website and admin API, based on the **P
 
 ```text
 estatein/
-├── backend/                 # Laravel API (your Laravel app root)
+├── backend/                 # Laravel API
 │   ├── app/
 │   │   ├── Http/Controllers/Api/{Public,Admin}/
 │   │   ├── Http/Requests/
@@ -66,12 +70,16 @@ estatein/
 │   ├── database/seeders/
 │   ├── routes/api.php
 │   └── tests/Feature/
+│       ├── AdminAuthTest.php
+│       ├── PropertyTest.php
+│       ├── SqlInjectionAndXssTest.php
+│       └── …
 │
-└── estatein-vue/            # Vue 3 SPA (this folder if cloned alone)
+└── frontend/                # Vue 3 SPA (or estatein-vue/)
     ├── src/
     │   ├── api/             # Public + admin HTTP clients
     │   ├── components/      # UI + cards + admin widgets
-    │   ├── composables/     # Vue Query hooks
+    │   ├── composables/     # Vue Query, form errors, locale helpers
     │   ├── i18n/ + locales/ # en.json / ar.json
     │   ├── stores/          # Pinia (auth, locale)
     │   ├── views/           # Public pages + admin CRUD
@@ -80,11 +88,40 @@ estatein/
     └── package.json
 ```
 
-> Adjust folder names if your backend lives at the repo root instead of `backend/`.
+> Adjust folder names if your backend lives at the repo root.
 
 ---
 
-## 3. Backend setup (Laravel)
+## 3. Features delivered
+
+### Public website
+
+- Pages aligned with the Estatein Figma template: **Home**, **About**, **Properties**, **Property detail**, **Services**, **Contact**
+- Responsive layouts (mobile / laptop / desktop) with Tailwind CSS
+- **EN / AR** UI chrome via **vue-i18n** + document `dir` (LTR/RTL)
+- CMS fields from the API via Spatie JSON (`en` / `ar`) and a `tField()` helper
+- Data loading with **TanStack Vue Query** (loading / error / empty + retry)
+- Published-only content on public endpoints
+
+### Admin dashboard (`/admin`)
+
+- Sanctum **Bearer** login / logout / session expiry redirect
+- CRUD for **properties** (features, multi-image, primary image, publish)
+- CRUD for **features**, **FAQs**, **testimonials**, **clients**, **team members**
+- Bilingual form fields with **Laravel 422** errors mapped next to inputs (`useFormErrors`, `FieldError`)
+- Dashboard counts and sidebar navigation
+
+### Backend architecture
+
+- **Repository → Service → Controller**
+- Shared bases: filters, search (translatable JSON), sort whitelist, pagination
+- Form Requests + API Resources (list vs detail shaping for properties)
+- Sanctum for `/api/v1/admin/*`
+- Spatie **Translatable** for CMS columns
+
+---
+
+## 4. Backend setup (Laravel)
 
 ```bash
 # From the Laravel project root
@@ -93,18 +130,13 @@ composer install
 cp .env.example .env
 php artisan key:generate
 
-# Configure DB in .env (see section 5)
+# Configure DB in .env (see section 6)
 
 php artisan migrate
 php artisan db:seed
 
-# Public disk for property / avatar / logo / photo uploads
+# Public disk for uploads
 php artisan storage:link
-
-# Sanctum (if not already installed)
-# composer require laravel/sanctum
-# php artisan vendor:publish --provider="Laravel\Sanctum\SanctumServiceProvider"
-# php artisan migrate
 
 php artisan serve
 # → http://127.0.0.1:8000
@@ -117,25 +149,17 @@ composer require laravel/sanctum
 composer require spatie/laravel-translatable
 ```
 
-### Architecture (backend)
-
-- **Repository** → data access, filters, search (including JSON translatable fields), sort, pagination  
-- **Service** → business logic, transactions, image handling, public `is_published` scope  
-- **Form requests** → validation (bilingual `title.en` / `title.ar`, uploads)  
-- **API resources** → consistent JSON (`fields`, `translated()`, pagination meta)  
-- **Sanctum** → Bearer tokens for `/api/v1/admin/*`
-
 ---
 
-## 4. Frontend setup (Vue)
+## 5. Frontend setup (Vue)
 
 ```bash
-cd estatein-vue   # or your frontend directory
+cd frontend   # or estatein-vue
 
 npm install
 
 cp .env.example .env
-# Set VITE_API_URL (see section 5)
+# Set VITE_API_URL (see section 6)
 
 npm run dev
 # → http://127.0.0.1:5173
@@ -145,16 +169,14 @@ npm run dev
 
 ```bash
 npm run build
-npm run preview   # optional local preview of dist/
+npm run preview
 ```
-
-Serve `dist/` behind Nginx, or deploy to Vercel/Netlify with `VITE_API_URL` pointing at your API.
 
 ---
 
-## 5. Environment variables
+## 6. Environment variables
 
-### Laravel `.env` (backend)
+### Laravel `.env`
 
 ```env
 APP_NAME=Estatein
@@ -171,28 +193,23 @@ DB_PASSWORD=
 
 FILESYSTEM_DISK=local
 
-# SPA origin (CORS)
 FRONTEND_URL=http://127.0.0.1:5173
 SANCTUM_STATEFUL_DOMAINS=localhost,localhost:5173,127.0.0.1,127.0.0.1:5173
 ```
 
-Ensure `config/cors.php` allows your frontend origin and `api/*` paths.
+Ensure `config/cors.php` allows the SPA origin and `api/*` paths.
 
-### Vue `.env` (frontend)
+### Vue `.env`
 
 ```env
 VITE_API_URL=http://127.0.0.1:8000/api/v1
 ```
 
-| Variable | Description |
-|----------|-------------|
-| `VITE_API_URL` | Base URL for all public + admin API calls (no trailing slash after `v1` is fine as used in code) |
+Restart Vite after changing `.env`.
 
 ---
 
-## 6. Migrations
-
-Run from the Laravel root:
+## 7. Migrations
 
 ```bash
 php artisan migrate
@@ -204,50 +221,45 @@ php artisan migrate
 |-------|--------|
 | `users` | Admin accounts (Sanctum tokens) |
 | `personal_access_tokens` | Sanctum |
-| `properties` | JSON: `title`, `description`, `location`; price, beds, baths, type, `is_published`, `sort_order` |
+| `properties` | JSON `title`, `description`, `location`; price, beds, baths, type, `is_published`, `sort_order` |
 | `property_images` | `path`, `is_primary`, `sort_order` |
-| `features` | JSON `name` (translatable) |
+| `features` | JSON `name` |
 | `feature_property` | Pivot + `sort_order` |
-| `faqs` | JSON `question`, `answer`; `is_published`, `sort_order` |
-| `testimonials` | JSON name/title/body/location; avatar, rating, publish |
+| `faqs` | JSON `question`, `answer`; publish + sort |
+| `testimonials` | JSON fields; avatar, rating, publish |
 | `clients` | JSON `name`; logo, website, publish |
 | `team_members` | JSON name/role/bio; photo, publish |
 
-```bash
-# Rollback last batch
-php artisan migrate:rollback
+Recommended performance indexes (if not already present):  
+`properties (is_published, sort_order)`, `type`, `property_images (property_id, is_primary, sort_order)`, and the same published/sort pattern on FAQs, testimonials, clients, team.
 
-# Fresh database (destructive)
-php artisan migrate:fresh
+```bash
+php artisan migrate:rollback
+php artisan migrate:fresh   # destructive
 ```
 
 ---
 
-## 7. Seeders
+## 8. Seeders
 
 ```bash
 php artisan db:seed
-# or specific:
-php artisan db:seed --class=AdminUserSeeder
-php artisan db:seed --class=DatabaseSeeder
 ```
 
-### Expected seed data (typical)
+Typical seed data:
 
-| Seeder | Purpose |
-|--------|---------|
-| `AdminUserSeeder` | Default admin user for dashboard login |
-| Features / Properties | Sample listings + images (optional paths) |
-| FAQs, Testimonials, Clients, Team | Bilingual published demo content |
+| Seeder focus | Purpose |
+|--------------|---------|
+| Admin user | Dashboard login for local demo |
+| Features / properties | Sample listings + images + feature pivot |
+| FAQs, testimonials, clients, team | Bilingual published content for public pages |
 
-**Default admin (if using the project seeder):**
+**Default admin (demo only — change in production):**
 
 ```text
 Email:    admin@estatein.test
 Password: password
 ```
-
-Change this in production.
 
 After seeding:
 
@@ -255,21 +267,17 @@ After seeding:
 php artisan storage:link
 ```
 
-so image URLs under `/storage/...` work.
-
 ---
 
-## 8. Running the app
-
-Use **two terminals**:
+## 9. Running the app
 
 ```bash
 # Terminal 1 — API
-cd backend   # Laravel root
+cd backend
 php artisan serve
 
 # Terminal 2 — SPA
-cd estatein-vue
+cd frontend
 npm run dev
 ```
 
@@ -279,11 +287,11 @@ npm run dev
 | http://127.0.0.1:5173/admin/login | Admin dashboard |
 | http://127.0.0.1:8000/api/v1/... | JSON API |
 
-Public content only shows rows with **`is_published = true`**. Unpublished items appear only in admin.
+Public responses only include **`is_published = true`** rows.
 
 ---
 
-## 9. API overview
+## 10. API overview
 
 Base path: **`/api/v1`**
 
@@ -298,21 +306,23 @@ Base path: **`/api/v1`**
 | GET | `/clients` |
 | GET | `/team-members` |
 
-Query params (where supported): `search`, `sort`, `direction`, `perPage`, `page`, filters (`type`, `bedrooms`, …), `relations[]`.
+Query params (where supported): `search`, `sort`, `direction`, `sort_locale`, `perPage`, `page`, filters (`type`, `bedrooms`, …).
+
+**Route constraint:** `{id}` is restricted to digits only (`Route::pattern('id', '[0-9]+')`) so malformed IDs return **404** instead of a type-error **500**.
 
 ### Admin (`Authorization: Bearer {token}`)
 
 | Area | Endpoints |
 |------|-----------|
 | Auth | `POST /admin/login`, `POST /admin/logout`, `GET /admin/me` |
-| Properties | full REST `/admin/properties` + image delete/primary |
+| Properties | REST `/admin/properties` + image delete / set-primary |
 | Features | `/admin/features` |
 | FAQs | `/admin/faqs` |
 | Testimonials | `/admin/testimonials` |
 | Clients | `/admin/clients` |
 | Team | `/admin/team-members` |
 
-Bilingual payloads use nested keys, e.g.:
+Bilingual payloads:
 
 ```json
 {
@@ -321,68 +331,142 @@ Bilingual payloads use nested keys, e.g.:
 }
 ```
 
-Multipart forms use `title[en]`, `images[]`, `logo`, `avatar`, `photo`, etc.
+Multipart forms use nested keys (`title[en]`, `images[]`, `logo`, `avatar`, `photo`, …).
 
 ---
 
-## 10. Admin dashboard
+## 11. Admin dashboard
 
-1. Open `/admin/login`  
-2. Sign in with the seeded admin  
-3. Manage:
-   - Properties (features, multi-image, primary image, publish)
-   - Features, FAQs, Testimonials, Clients, Team  
-4. Log out from the sidebar  
+1. Open `/admin/login`
+2. Sign in with the seeded admin
+3. Manage properties, features, FAQs, testimonials, clients, team
+4. Log out from the sidebar
 
-Token is stored in `localStorage` as `admin_token` and sent on each API request.
+Token key: `admin_token` in `localStorage`.
+
+On **401** from `/admin/*` (except login), the client clears the token and redirects to `/admin/login?expired=1`.
+
+Laravel **422** validation errors are shown in a banner and under the matching fields (including `title.en` / `title.ar`).
 
 ---
 
-## 11. Tests
+## 12. Security
 
-### Backend (PHPUnit / Pest)
+### SQL injection
+
+- Queries use **Eloquent / query builder parameter binding**
+- **Search** and **filter** values are bound, not concatenated
+- **Sort column** is restricted to a **whitelist** (invalid → `422`)
+- **Sort locale** is restricted to `en` / `ar` (invalid → `422`) before any JSON path order
+- **Route `{id}`** accepts only numeric IDs (`[0-9]+`)
+
+### XSS
+
+- API responses are **`application/json` only**
+- User content is stored and returned as **text**; the SPA renders via Vue text interpolation (**no `v-html`** for CMS fields)
+- Script / event-handler strings are treated as **literal data**, not executable HTML
+
+### Auth
+
+- Admin routes require a valid Sanctum token
+- Guests cannot create/update/delete protected resources
+- Logout deletes the current access token
+
+---
+
+## 13. Tests
 
 ```bash
 cd backend
 php artisan test
 
-# Filter examples
+# Examples
 php artisan test --filter=AdminAuthTest
-php artisan test --filter=ContentResourcesTest
+php artisan test --filter=PropertyTest
+php artisan test --filter=SqlInjectionAndXssTest
 ```
 
-**Typical coverage**
+### Auth (`AdminAuthTest`)
 
-- Admin login / invalid credentials / me / logout  
-- Guest cannot access admin routes  
-- Public lists hide unpublished content  
-- CRUD happy paths for content resources  
-- Validation (e.g. both `en` and `ar` required where defined)
+- Admin can login  
+- Invalid credentials fail  
+- Guest cannot access `/admin/me`  
+- Authenticated admin can access `/admin/me`  
+- Logout invalidates the token for later requests  
 
-### Frontend
+### Properties (`PropertyTest`)
 
-No mandatory unit-test suite in the base scaffold. Manual checks:
+- Public index/detail **hide unpublished**; unpublished detail → **404**  
+- Guest blocked from create/delete  
+- Admin CRUD: create with feature sync; update price/publish/features; delete removes images from disk and `property_images`  
+- Validation: both title locales required; negative price rejected; non-image (PDF) rejected; unknown `feature_ids` rejected  
+- Images: first image primary on create; update adds images without stealing primary; deleting primary reassigns; set-primary moves the flag  
+- Create/update responses use **detail** resource shape (includes `is_published`, features, images)—not the abbreviated public list shape  
+
+### SQL injection & XSS (`SqlInjectionAndXssTest`)
+
+**SQL injection (6 tests)**
+
+| Case | Expected |
+|------|----------|
+| Classic search payloads (`' OR 1=1 --`, `DROP TABLE`, `UNION SELECT`, …) | `200` with **0** matching rows; table intact |
+| Search cannot bypass `is_published` | Unpublished never listed; normal search still works |
+| Malicious `sort` column | **422** (whitelist) |
+| Malicious `sort_locale` | **422** (`in:en,ar`) |
+| Filter `type=Villa' OR 1=1 --` | 0 rows; clean `type=Villa` still returns data |
+| Route id `1 OR 1=1` / `1; DROP...` | **404**; table survives |
+
+**XSS (4 tests)**
+
+| Case | Expected |
+|------|----------|
+| `<script>…</script>` stored via admin | Returned verbatim as JSON text; `Content-Type: application/json` |
+| `<img … onerror=…>` in description | Same — inert data |
+| HTML payloads in search/type | Treated as literal strings |
+| Admin create/update with SVG/onload-style payload | Round-trips safely as JSON |
+
+### Frontend (manual)
 
 - [ ] Home loads properties / FAQs / testimonials from API  
-- [ ] EN ↔ AR toggle updates UI chrome and `dir="rtl"`  
+- [ ] EN ↔ AR updates chrome and RTL  
 - [ ] Property detail shows gallery + features  
-- [ ] Admin login → CRUD → public page reflects published changes  
-
-Optional later: Vitest + Vue Testing Library.
+- [ ] Admin login → CRUD → public reflects published changes  
+- [ ] 422 field errors on empty required locale fields  
+- [ ] Expired token redirects to login with notice  
 
 ---
 
-## 12. Common issues
+## 14. Performance notes
+
+- Public **property list** should not default to loading full feature sets; prefer primary/cover image for cards; full gallery + features on **detail**
+- Add DB indexes on `is_published` + `sort_order` (and related FKs) if missing  
+- Prefer Nginx/PHP-FPM or Herd over `php artisan serve` when measuring concurrent `/storage` image load  
+- Compress large seed/upload images  
+- Vue Query `staleTime` reduces duplicate refetches on navigation  
+
+---
+
+## 15. Common issues
 
 | Problem | Fix |
 |---------|-----|
-| CORS errors | Set `FRONTEND_URL`, allow origin in `config/cors.php`, restart `artisan serve` |
-| Images 404 | `php artisan storage:link`; ensure files stored on `public` disk |
-| 401 on admin | Login again; check Bearer token; `auth:sanctum` on admin routes |
-| Empty public lists | Seed data + set `is_published = true` |
-| Vue cannot reach API | `VITE_API_URL` must match Laravel URL; restart Vite after `.env` change |
-| Translatable search | Use JSON path search in repository (`title->en`, `title->ar`) |
-| File upload on update | Admin uses `POST` + `_method=PUT` with `FormData` |
+| CORS errors | `FRONTEND_URL`, `config/cors.php`, restart API |
+| Images 404 | `php artisan storage:link`; public disk |
+| 401 on admin | Login again; check Bearer token |
+| Empty public lists | Seed + `is_published = true` |
+| SPA cannot reach API | `VITE_API_URL` + restart Vite |
+| Build fails on TS options | Align `tsconfig` with installed TypeScript version |
+| Malformed property id returns 500 | Ensure `Route::pattern('id', '[0-9]+')` in `routes/api.php` |
+
+---
+
+## 16. Related docs
+
+| File | Content |
+|------|---------|
+| `README.md` | This file — setup, run, API, security, tests |
+| `AI_USAGE.md` | How AI was used (planning, Vue-from-React, tests, seeders, env) |
+| `INCOMPLETE_FEATURES_AND_ASSUMPTIONS.md` | Known gaps and project assumptions |
 
 ---
 
@@ -414,11 +498,8 @@ UI inspired by **Produce UI — Real Estate Business Website UI Template (Dark T
 
 This README covers:
 
-- **Requirements** (runtime & stack)  
-- **Installation** (Composer + npm)  
-- **Configuration** (`.env`, CORS, storage)  
-- **Run** (API + SPA)  
-- **Migrations** & **seeders**  
-- **Tests** (backend + manual frontend checklist)  
-
-For AI-assisted development documentation, see `AI_USAGE.md` if provided in the submission package.
+- Requirements, installation, configuration, and run instructions  
+- Migrations and seeders  
+- Public + admin API surface  
+- Security posture (SQL injection / XSS / auth) and automated tests  
+- Related disclosure documents for incomplete features and AI usage  

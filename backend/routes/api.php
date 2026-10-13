@@ -15,6 +15,10 @@ use App\Http\Controllers\Api\Public\TeamMemberController as PublicTeamMemberCont
 use App\Http\Controllers\Api\Public\TestimonialController as PublicTestimonialController;
 use Illuminate\Support\Facades\Route;
 
+// Non-numeric ids can never reach a controller: the route simply 404s.
+// This blocks type-juggling and SQL-injection probes on route parameters.
+Route::pattern('id', '[0-9]+');
+
 Route::prefix('v1')->group(function () {
 
     /*
