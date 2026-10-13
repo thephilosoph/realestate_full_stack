@@ -17,7 +17,7 @@ class TeamMemberSeeder extends Seeder
                     'en' => 'Sarah has over 15 years of experience leading real estate firms across the region.',
                     'ar' => 'تمتلك سارة أكثر من 15 عاماً من الخبرة في قيادة شركات العقارات في المنطقة.',
                 ],
-                'photo_path' => null,
+                'photo_path' => 'team/sarah-mitchell.jpg',
             ],
             [
                 'name' => ['en' => 'Omar Hassan', 'ar' => 'عمر حسن'],
@@ -26,7 +26,7 @@ class TeamMemberSeeder extends Seeder
                     'en' => 'Omar specializes in luxury villas and off-plan investments.',
                     'ar' => 'يتخصص عمر في الفلل الفاخرة والاستثمارات على المخطط.',
                 ],
-                'photo_path' => null,
+                'photo_path' => 'team/omar-hassan.jpg',
             ],
             [
                 'name' => ['en' => 'Layla Ahmed', 'ar' => 'ليلى أحمد'],
@@ -35,7 +35,7 @@ class TeamMemberSeeder extends Seeder
                     'en' => 'Layla leads the sales team with a passion for matching clients with their dream homes.',
                     'ar' => 'تقود ليلى فريق المبيعات بشغف لربط العملاء بمنازل أحلامهم.',
                 ],
-                'photo_path' => null,
+                'photo_path' => 'team/layla-ahmed.jpg',
             ],
             [
                 'name' => ['en' => 'Michael Chen', 'ar' => 'مايكل تشين'],

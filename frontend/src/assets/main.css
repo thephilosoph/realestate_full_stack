@@ -1,0 +1,55 @@
+@import 'tailwindcss';
+
+/*
+ * Estatein design tokens — taken from the Figma template
+ * (Real Estate Business Website UI, dark theme).
+ */
+@theme {
+  --font-sans: 'Urbanist', 'IBM Plex Sans Arabic', ui-sans-serif, system-ui, sans-serif;
+
+  --color-background: #141414; /* page background */
+  --color-surface: #1a1a1a; /* cards, nav pill, chips */
+  --color-surface-hover: #222222;
+  --color-line: #262626; /* borders */
+  --color-line-strong: #333333;
+  --color-primary: #703bf7;
+  --color-primary-light: #a685fa;
+  --color-muted: #999999; /* secondary text */
+  --color-soft: #666666; /* tertiary text */
+  --color-star: #ffe600;
+}
+
+@layer base {
+  html {
+    scroll-behavior: smooth;
+  }
+
+  /* Prefer the Arabic typeface when the interface is in Arabic. */
+  [dir='rtl'] body {
+    font-family: 'IBM Plex Sans Arabic', 'Urbanist', ui-sans-serif, system-ui, sans-serif;
+  }
+}
+
+@layer components {
+  /* Page-width wrapper shared by every section. */
+  .shell {
+    @apply mx-auto w-full max-w-[1280px] px-4 sm:px-6;
+  }
+
+  .btn-primary {
+    @apply inline-flex items-center justify-center gap-2 rounded-lg bg-primary px-6 py-3.5 text-[15px] font-semibold text-white transition-colors hover:bg-[#8254f8];
+  }
+
+  .btn-secondary {
+    @apply inline-flex items-center justify-center gap-2 rounded-lg border border-line bg-surface px-6 py-3.5 text-[15px] font-medium text-white transition-colors hover:border-line-strong hover:bg-surface-hover;
+  }
+
+  .btn-ghost {
+    @apply inline-flex items-center justify-center gap-2 rounded-lg border border-line px-5 py-2.5 text-sm font-medium text-white transition-colors hover:bg-surface;
+  }
+
+  /* Small bordered chip used for property facts (beds, baths, type...). */
+  .chip {
+    @apply inline-flex items-center gap-1.5 rounded-full border border-line bg-surface px-3 py-1.5 text-[13px] font-medium text-muted;
+  }
+}

@@ -12,52 +12,51 @@ class PropertySeeder extends Seeder
     {
         $properties = [
             [
-                'title' => ['en' => 'Seaside Serenity Villa', 'ar' => 'فيلا سيرينيتي الساحلية'],
+                'title' => ['en' => 'Metropolitan Haven', 'ar' => 'ملاذ العاصمة'],
+                'description' => [
+                    'en' => 'A chic and fully-furnished 4-bedroom apartment with panoramic city views and premium amenities.',
+                    'ar' => 'شقة أنيقة ومفروشة بالكامل من 4 غرف نوم مع إطلالات بانورامية على المدينة ومرافق فاخرة.',
+                ],
+                'price' => 550000,
+                'bedrooms' => 4,
+                'bathrooms' => 3,
+                'type' => 'Villa',
+                'location' => ['en' => 'New York, NY', 'ar' => 'نيويورك'],
+                'features' => ['Gym', '24/7 Security', 'Balcony', 'Central Air Conditioning'],
+                'images' => [
+                    ['path' => 'properties/metropolitan-haven.jpg', 'is_primary' => true],
+                ],
+            ],
+            [
+                'title' => ['en' => 'Seaside Villa', 'ar' => 'الفيلا الساحلية'],
                 'description' => [
                     'en' => 'A stunning 4-bedroom, 3-bathroom villa in a peaceful suburban neighborhood with ocean views and modern finishes.',
                     'ar' => 'فيلا فاخرة مكونة من 4 غرف نوم و3 حمامات في حي سكني هادئ مع إطلالات على المحيط وتشطيبات عصرية.',
                 ],
-                'price' => 500000,
-                'bedrooms' => 4,
-                'bathrooms' => 3,
+                'price' => 350000,
+                'bedrooms' => 2,
+                'bathrooms' => 2,
                 'type' => 'Villa',
                 'location' => ['en' => 'Malibu, CA', 'ar' => 'ماليبو، كاليفورنيا'],
                 'features' => ['Swimming Pool', 'Sea View', 'Private Garden', '24/7 Security'],
                 'images' => [
-                    ['path' => 'https://images.unsplash.com/photo-1613490493576-7fde63acd811?w=800&q=80', 'is_primary' => true],
-                    ['path' => 'https://images.unsplash.com/photo-1600596542815-ffad4c1539a9?w=800&q=80', 'is_primary' => false],
+                    ['path' => 'properties/seaside-serenity-villa.jpg', 'is_primary' => true],
                 ],
             ],
             [
-                'title' => ['en' => 'Metropolitan Haven', 'ar' => 'ملاذ العاصمة'],
+                'title' => ['en' => 'Suburban Cottage', 'ar' => 'كوخ الضواحي'],
                 'description' => [
-                    'en' => 'A chic and fully-furnished 2-bedroom apartment with panoramic city views and premium amenities.',
-                    'ar' => 'شقة أنيقة ومفروشة بالكامل من غرفتي نوم مع إطلالات بانورامية على المدينة ومرافق فاخرة.',
+                    'en' => 'An elegant 3-bedroom, 2.5-bathroom townhouse in a gated community surrounded by nature.',
+                    'ar' => 'منزل أنيق مكون من 3 غرف نوم وحمامين ونصف في مجمع سكني مسور تحيط به الطبيعة.',
                 ],
-                'price' => 600000,
-                'bedrooms' => 2,
-                'bathrooms' => 2,
-                'type' => 'Apartment',
-                'location' => ['en' => 'New York, NY', 'ar' => 'نيويورك'],
-                'features' => ['Gym', '24/7 Security', 'Balcony', 'Central Air Conditioning'],
-                'images' => [
-                    ['path' => 'https://images.unsplash.com/photo-1502672260266-1c1ef2d93688?w=800&q=80', 'is_primary' => true],
-                ],
-            ],
-            [
-                'title' => ['en' => 'Rustic Retreat Cottage', 'ar' => 'كوخ الريفي الهادئ'],
-                'description' => [
-                    'en' => 'An elegant 3-bedroom, 3-bathroom townhouse in a gated community surrounded by nature.',
-                    'ar' => 'منزل أنيق مكون من 3 غرف نوم و3 حمامات في مجمع سكني مسور تحيط به الطبيعة.',
-                ],
-                'price' => 500000,
+                'price' => 420000,
                 'bedrooms' => 3,
                 'bathrooms' => 3,
                 'type' => 'Villa',
                 'location' => ['en' => 'Aspen, CO', 'ar' => 'أسبن، كولورادو'],
                 'features' => ['Private Garden', 'Parking', 'Central Air Conditioning'],
                 'images' => [
-                    ['path' => 'https://images.unsplash.com/photo-1600596542815-ffad4c1539a9?w=800&q=80', 'is_primary' => true],
+                    ['path' => 'properties/rustic-retreat-cottage.jpg', 'is_primary' => true],
                 ],
             ],
             [

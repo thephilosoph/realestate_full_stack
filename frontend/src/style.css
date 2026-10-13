@@ -1,0 +1,90 @@
+@import "tailwindcss";
+
+/*
+  Estatein — Produce UI dark theme tokens
+  Figma frames: Mobile 390 · Laptop 1440 · Desktop 1920
+*/
+@theme {
+  --font-sans: "Urbanist", ui-sans-serif, system-ui, sans-serif;
+
+  --color-bg: #141414;
+  --color-bg-elevated: #1a1a1a;
+  --color-bg-card: #1c1c1c;
+  --color-bg-card-hover: #222222;
+  --color-border: #262626;
+  --color-border-light: #333333;
+  --color-muted: #999999;
+  --color-soft: #666666;
+  --color-purple: #703bf7;
+  --color-purple-hover: #8254f8;
+  --color-purple-soft: rgba(112, 59, 247, 0.15);
+
+  --breakpoint-sm: 390px;
+  --breakpoint-md: 768px;
+  --breakpoint-lg: 1024px;
+  --breakpoint-xl: 1280px;
+  --breakpoint-2xl: 1440px;
+  --breakpoint-3xl: 1920px;
+}
+
+@layer base {
+  html {
+    scroll-behavior: smooth;
+  }
+
+  body {
+    @apply bg-bg text-white font-sans antialiased min-h-screen;
+  }
+
+  img {
+    @apply max-w-full block;
+  }
+}
+
+@utility btn {
+  @apply inline-flex items-center justify-center gap-2 rounded-[10px] px-5 py-3.5 text-[15px] font-medium transition-colors whitespace-nowrap;
+}
+
+@layer components {
+  .container-estate {
+    @apply w-full mx-auto px-4 md:px-8 xl:px-10 2xl:px-20;
+    max-width: 1596px;
+  }
+
+  .btn-primary {
+    @apply btn bg-purple text-white hover:bg-purple-hover;
+  }
+
+  .btn-secondary {
+    @apply btn bg-bg-elevated text-white border border-border-light hover:bg-bg-card-hover;
+  }
+
+  .btn-ghost {
+    @apply btn bg-transparent text-white border border-border-light hover:bg-bg-elevated;
+  }
+
+
+  .card {
+    @apply bg-bg-card border border-border rounded-2xl transition-colors;
+  }
+
+  .card:hover {
+    @apply border-border-light bg-bg-card-hover;
+  }
+
+  .chip {
+    @apply inline-flex items-center gap-1.5 rounded-full bg-bg-elevated border border-border px-3 py-1.5 text-[13px] text-muted;
+  }
+
+  .section {
+    @apply py-14 md:py-16 xl:py-20;
+  }
+
+  .section-title {
+    @apply text-[28px] md:text-[32px] xl:text-[40px] font-semibold tracking-tight mb-3;
+  }
+
+  .section-desc {
+    @apply text-muted text-base leading-relaxed max-w-xl;
+  }
+}

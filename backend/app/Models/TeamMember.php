@@ -32,9 +32,15 @@ class TeamMember extends Model
 
     public function getPhotoUrlAttribute(): ?string
     {
-        return $this->photo_path
-            ? Storage::disk('public')->url($this->photo_path)
-            : null;
+        if (! $this->photo_path) {
+            return null;
+        }
+
+        if (str_starts_with($this->photo_path, 'http')) {
+            return $this->photo_path;
+        }
+
+        return Storage::disk('public')->url($this->photo_path);
     }
     
 }
