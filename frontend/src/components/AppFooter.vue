@@ -1,5 +1,8 @@
 <script setup lang="ts">
+import { useLocalized } from '@/composables/useLocalized'
+
 const year = new Date().getFullYear()
+const { t } = useLocalized()
 </script>
 
 <template>
@@ -14,7 +17,7 @@ const year = new Date().getFullYear()
           <span class="text-muted">✉</span>
           <input
             type="email"
-            placeholder="Enter Your Email"
+            :placeholder="t('footer.emailPlaceholder')"
             class="min-w-0 flex-1 bg-transparent text-sm outline-none placeholder:text-soft"
           />
           <button type="submit" class="text-purple" aria-label="Subscribe">➤</button>
@@ -22,55 +25,55 @@ const year = new Date().getFullYear()
       </div>
 
       <div>
-        <h4 class="mb-4 text-[15px] font-semibold">Home</h4>
+        <h4 class="mb-4 text-[15px] font-semibold">{{ t('footer.home') }}</h4>
         <ul class="flex flex-col gap-2.5 text-sm text-muted">
-          <li><router-link to="/" class="hover:text-white">Hero Section</router-link></li>
-          <li><router-link to="/#features" class="hover:text-white">Features</router-link></li>
-          <li><router-link to="/properties" class="hover:text-white">Properties</router-link></li>
-          <li><router-link to="/#testimonials" class="hover:text-white">Testimonials</router-link></li>
-          <li><router-link to="/#faq" class="hover:text-white">FAQ's</router-link></li>
+          <li><router-link to="/" class="hover:text-white">{{ t('footer.heroSection') }}</router-link></li>
+          <li><router-link to="/#features" class="hover:text-white">{{ t('footer.features') }}</router-link></li>
+          <li><router-link to="/properties" class="hover:text-white">{{ t('footer.properties') }}</router-link></li>
+          <li><router-link to="/#testimonials" class="hover:text-white">{{ t('footer.testimonials') }}</router-link></li>
+          <li><router-link to="/#faq" class="hover:text-white">{{ t('footer.faqs') }}</router-link></li>
         </ul>
       </div>
       <div>
-        <h4 class="mb-4 text-[15px] font-semibold">About Us</h4>
+        <h4 class="mb-4 text-[15px] font-semibold">{{ t('footer.about') }}</h4>
         <ul class="flex flex-col gap-2.5 text-sm text-muted">
-          <li><router-link to="/about" class="hover:text-white">Our Story</router-link></li>
-          <li><router-link to="/about" class="hover:text-white">Our Works</router-link></li>
-          <li><router-link to="/about" class="hover:text-white">How It Works</router-link></li>
-          <li><router-link to="/about" class="hover:text-white">Our Team</router-link></li>
-          <li><router-link to="/about" class="hover:text-white">Our Clients</router-link></li>
+          <li><router-link to="/about" class="hover:text-white">{{ t('footer.ourStory') }}</router-link></li>
+          <li><router-link to="/about" class="hover:text-white">{{ t('footer.ourWorks') }}</router-link></li>
+          <li><router-link to="/about" class="hover:text-white">{{ t('footer.howItWorks') }}</router-link></li>
+          <li><router-link to="/about" class="hover:text-white">{{ t('footer.ourTeam') }}</router-link></li>
+          <li><router-link to="/about" class="hover:text-white">{{ t('footer.ourClients') }}</router-link></li>
         </ul>
       </div>
       <div>
-        <h4 class="mb-4 text-[15px] font-semibold">Properties</h4>
+        <h4 class="mb-4 text-[15px] font-semibold">{{ t('footer.properties') }}</h4>
         <ul class="flex flex-col gap-2.5 text-sm text-muted">
-          <li><router-link to="/properties" class="hover:text-white">Portfolio</router-link></li>
-          <li><router-link to="/properties" class="hover:text-white">Categories</router-link></li>
+          <li><router-link to="/properties" class="hover:text-white">{{ t('footer.portfolio') }}</router-link></li>
+          <li><router-link to="/properties" class="hover:text-white">{{ t('footer.categories') }}</router-link></li>
         </ul>
       </div>
       <div>
-        <h4 class="mb-4 text-[15px] font-semibold">Services</h4>
+        <h4 class="mb-4 text-[15px] font-semibold">{{ t('footer.services') }}</h4>
         <ul class="flex flex-col gap-2.5 text-sm text-muted">
-          <li><router-link to="/services" class="hover:text-white">Valuation Mastery</router-link></li>
-          <li><router-link to="/services" class="hover:text-white">Strategic Marketing</router-link></li>
-          <li><router-link to="/services" class="hover:text-white">Negotiation Wizardry</router-link></li>
-          <li><router-link to="/services" class="hover:text-white">Closing Success</router-link></li>
-          <li><router-link to="/services" class="hover:text-white">Property Management</router-link></li>
+          <li><router-link to="/services" class="hover:text-white">{{ t('footer.valuation') }}</router-link></li>
+          <li><router-link to="/services" class="hover:text-white">{{ t('footer.marketing') }}</router-link></li>
+          <li><router-link to="/services" class="hover:text-white">{{ t('footer.negotiation') }}</router-link></li>
+          <li><router-link to="/services" class="hover:text-white">{{ t('footer.closing') }}</router-link></li>
+          <li><router-link to="/services" class="hover:text-white">{{ t('footer.propMgmt') }}</router-link></li>
         </ul>
       </div>
       <div>
-        <h4 class="mb-4 text-[15px] font-semibold">Contact Us</h4>
+        <h4 class="mb-4 text-[15px] font-semibold">{{ t('footer.contact') }}</h4>
         <ul class="flex flex-col gap-2.5 text-sm text-muted">
-          <li><router-link to="/contact" class="hover:text-white">Contact Form</router-link></li>
-          <li><router-link to="/contact" class="hover:text-white">Our Offices</router-link></li>
+          <li><router-link to="/contact" class="hover:text-white">{{ t('footer.contactForm') }}</router-link></li>
+          <li><router-link to="/contact" class="hover:text-white">{{ t('footer.ourOffices') }}</router-link></li>
         </ul>
       </div>
     </div>
 
     <div class="container-estate flex flex-col gap-4 border-t border-border py-6 text-sm text-muted sm:flex-row sm:items-center sm:justify-between">
       <div class="flex flex-wrap gap-4">
-        <span>©{{ year }} Estatein. All Rights Reserved.</span>
-        <a href="#" class="hover:text-white">Terms & Conditions</a>
+        <span>©{{ year }} Estatein. {{ t('footer.rights') }}</span>
+        <a href="#" class="hover:text-white">{{ t('footer.terms') }}</a>
       </div>
       <div class="flex gap-3">
         <a href="#" class="flex size-9 items-center justify-center rounded-full bg-bg-elevated hover:bg-border" aria-label="Facebook">f</a>
