@@ -1,10 +1,14 @@
 <script setup lang="ts">
+import FieldError from '@/components/ui/FieldError.vue'
+
 const model = defineModel<{ en: string; ar: string }>({ required: true })
 
 defineProps<{
   label: string
   multiline?: boolean
   required?: boolean
+  errorEn?: string
+  errorAr?: string
 }>()
 </script>
 
@@ -26,6 +30,7 @@ defineProps<{
         :required="required"
         class="rounded-lg border border-border-light bg-bg px-3 py-2.5 outline-none focus:border-purple"
       />
+      <FieldError :message="errorEn" />
     </label>
     <label class="flex flex-col gap-1.5 text-sm">
       <span class="text-muted">{{ label }} (AR)</span>
@@ -45,6 +50,7 @@ defineProps<{
         dir="rtl"
         class="rounded-lg border border-border-light bg-bg px-3 py-2.5 outline-none focus:border-purple"
       />
+      <FieldError :message="errorAr" />
     </label>
   </div>
 </template>

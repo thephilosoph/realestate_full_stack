@@ -8,8 +8,8 @@ class PropertyResource extends BaseResource
 {
     protected function fields(Request $request): array
 {
-    $isList = $request->routeIs('api.v1.properties.index')
-        || ! $request->route('id'); 
+    // List shape only for GET collections; create/update/show return the full shape.
+    $isList = $request->isMethod('GET') && ! $request->route('id');
 
     if ($isList) {
         return [
@@ -48,7 +48,7 @@ class PropertyResource extends BaseResource
 
 protected function includeRelations(Request $request): array
 {
-    $isDetail = $request->route('property') || $request->route('id');
+    $isDetail = ! $request->isMethod('GET') || (bool) $request->route('id');
 
     return [
         'images' => $this->when(

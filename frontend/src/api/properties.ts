@@ -1,23 +1,6 @@
 import apiClient from './client'
 import type { PaginatedResponse, Property, PropertyFilters } from '@/types'
 
-function toQuery(params: PropertyFilters = {}) {
-  const q: Record<string, string | number> = {}
-  if (params.search) q.search = params.search
-  if (params.type) q.type = params.type
-  if (params.bedrooms != null) q.bedrooms = params.bedrooms
-  if (params.bathrooms != null) q.bathrooms = params.bathrooms
-  if (params.perPage) q.perPage = params.perPage
-  if (params.page) q.page = params.page
-  if (params.sort) q.sort = params.sort
-  if (params.direction) q.direction = params.direction
-  q['relations[]'] = 'images' as unknown as number
-  return {
-    ...q,
-    'relations[]': ['images', 'features'],
-  }
-}
-
 export async function fetchProperties(params: PropertyFilters = {}) {
   const { data } = await apiClient.get<PaginatedResponse<Property>>('/properties', {
     params: {

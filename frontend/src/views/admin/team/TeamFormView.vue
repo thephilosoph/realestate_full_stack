@@ -3,11 +3,14 @@ import { onMounted, ref } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 import { adminTeam } from '@/api/admin/resources'
 import LocalizedFields from '@/components/admin/LocalizedFields.vue'
+import FieldError from '@/components/ui/FieldError.vue'
+import { useFormErrors } from '@/composables/useFormErrors'
 
 const route = useRoute()
 const router = useRouter()
 const id = route.params.id as string | undefined
 const isEdit = id && id !== 'new'
+const { message: errorMessage, setFromError, clear: clearErrors, first } = useFormErrors()
 
 const name = ref({ en: '', ar: '' })
 const role = ref({ en: '', ar: '' })
@@ -37,7 +40,7 @@ onMounted(async () => {
 
 async function save() {
   saving.value = true
-  error.value = ''
+  clearErrors()
   try {
     const fd = new FormData()
     fd.append('name[en]', name.value.en)
@@ -53,7 +56,7 @@ async function save() {
     else await adminTeam.create(fd)
     await router.push('/admin/team')
   } catch (e: unknown) {
-    error.value = e instanceof Error ? e.message : 'Save failed'
+    setFromError(e, 'Save failed')
   } finally {
     saving.value = false
   }
@@ -64,13 +67,17 @@ async function save() {
   <div>
     <h1 class="mb-6 text-2xl font-semibold">{{ isEdit ? 'Edit member' : 'New member' }}</h1>
     <p v-if="error" class="mb-4 text-red-400">{{ error }}</p>
+    <p v-if="errorMessage" class="mb-4 rounded-lg border border-red-900/50 bg-red-950/40 px-3 py-2 text-sm text-red-300">
+      {{ errorMessage }}
+    </p>
     <form class="card max-w-3xl space-y-5 p-6" @submit.prevent="save">
-      <LocalizedFields v-model="name" label="Name" required />
-      <LocalizedFields v-model="role" label="Role" required />
-      <LocalizedFields v-model="bio" label="Bio" multiline />
+      <LocalizedFields v-model="name" label="Name" required :error-en="first('name.en')" :error-ar="first('name.ar')" />
+      <LocalizedFields v-model="role" label="Role" required :error-en="first('role.en')" :error-ar="first('role.ar')" />
+      <LocalizedFields v-model="bio" label="Bio" multiline :error-en="first('bio.en')" :error-ar="first('bio.ar')" />
       <label class="flex flex-col gap-1.5 text-sm">
         Photo
         <input type="file" accept="image/*" @change="photo = ($event.target as HTMLInputElement).files?.[0] || null" />
+        <FieldError :message="first('photo')" />
       </label>
       <label class="flex items-center gap-2 text-sm">
         <input v-model="is_published" type="checkbox" class="accent-purple" /> Published

@@ -1,15 +1,17 @@
 <script setup lang="ts">
 import { ref } from 'vue'
-import { useRouter } from 'vue-router'
+import { useRoute, useRouter } from 'vue-router'
 import { useAuthStore } from '@/stores/auth'
 
 const auth = useAuthStore()
 const router = useRouter()
+const route = useRoute()
 
 const email = ref('admin@estatein.test')
 const password = ref('password')
 const error = ref('')
 const loading = ref(false)
+const sessionExpired = route.query.expired === '1'
 
 async function onSubmit() {
   error.value = ''
@@ -37,6 +39,10 @@ async function onSubmit() {
     >
       <h1 class="mb-1 text-2xl font-semibold">Admin login</h1>
       <p class="mb-6 text-sm text-muted">Sign in to manage Estatein content</p>
+
+      <div v-if="sessionExpired" class="mb-4 rounded-lg border border-amber-900/50 bg-amber-950/40 px-3 py-2 text-sm text-amber-300">
+        Your session has expired. Please sign in again.
+      </div>
 
       <div v-if="error" class="mb-4 rounded-lg border border-red-900/50 bg-red-950/40 px-3 py-2 text-sm text-red-300">
         {{ error }}
