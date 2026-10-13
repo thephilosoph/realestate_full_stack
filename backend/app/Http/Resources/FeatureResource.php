@@ -17,8 +17,11 @@ class FeatureResource extends BaseResource
         ];
     }
 
-    protected function includeMeta(Request $request): array
+    protected function includeMeta($request): array
     {
-        return [];
+        return [
+            'created_at' => $this->created_at?->toIso8601String(),
+            'updated_at' => $this->updated_at?->toIso8601String(),
+        ];
     }
 }

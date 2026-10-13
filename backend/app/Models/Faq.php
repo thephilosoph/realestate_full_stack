@@ -13,4 +13,16 @@ class Faq extends Model
         'question',
         'answer',
     ];
+
+    protected $fillable = [
+        'question', 'answer', 'is_published', 'sort_order',
+    ];
+
+    protected function casts(): array
+    {
+        return [
+            'is_published' => 'boolean',
+            'sort_order' => 'integer',
+        ];
+    }
 }

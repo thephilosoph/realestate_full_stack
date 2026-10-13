@@ -1,151 +1,105 @@
 {
   "info": {
-    "name": "Estatein — Properties API",
-    "description": "Public + Admin property endpoints. Set collection variables: base_url, token.",
+    "name": "Estatein — Features FAQs Testimonials Clients Team",
     "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
   },
   "variable": [
     { "key": "base_url", "value": "http://localhost:8000/api/v1" },
     { "key": "token", "value": "" },
-    { "key": "property_id", "value": "1" },
-    { "key": "image_id", "value": "1" }
+    { "key": "feature_id", "value": "1" },
+    { "key": "faq_id", "value": "1" },
+    { "key": "testimonial_id", "value": "1" },
+    { "key": "client_id", "value": "1" },
+    { "key": "team_member_id", "value": "1" }
   ],
   "item": [
     {
-      "name": "Auth",
+      "name": "Auth Login",
+      "event": [{
+        "listen": "test",
+        "script": {
+          "exec": [
+            "const j = pm.response.json();",
+            "if (j.token) pm.collectionVariables.set('token', j.token);"
+          ]
+        }
+      }],
+      "request": {
+        "method": "POST",
+        "header": [
+          { "key": "Accept", "value": "application/json" },
+          { "key": "Content-Type", "value": "application/json" }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\"email\":\"admin@estatein.test\",\"password\":\"password\"}"
+        },
+        "url": "{{base_url}}/admin/login"
+      }
+    },
+    {
+      "name": "Public",
       "item": [
         {
-          "name": "Admin Login",
-          "event": [
-            {
-              "listen": "test",
-              "script": {
-                "exec": [
-                  "if (pm.response.code === 200) {",
-                  "  const json = pm.response.json();",
-                  "  if (json.token) pm.collectionVariables.set('token', json.token);",
-                  "}"
-                ]
-              }
-            }
-          ],
-          "request": {
-            "method": "POST",
-            "header": [
-              { "key": "Accept", "value": "application/json" },
-              { "key": "Content-Type", "value": "application/json" }
-            ],
-            "body": {
-              "mode": "raw",
-              "raw": "{\n  \"email\": \"admin@estatein.test\",\n  \"password\": \"password\"\n}"
-            },
-            "url": "{{base_url}}/admin/login"
-          }
-        },
-        {
-          "name": "Admin Me",
+          "name": "List FAQs",
           "request": {
             "method": "GET",
-            "header": [
-              { "key": "Accept", "value": "application/json" },
-              { "key": "Authorization", "value": "Bearer {{token}}" }
-            ],
-            "url": "{{base_url}}/admin/me"
+            "header": [{ "key": "Accept", "value": "application/json" }],
+            "url": "{{base_url}}/faqs?perPage=15"
           }
         },
         {
-          "name": "Admin Logout",
+          "name": "List Testimonials",
           "request": {
-            "method": "POST",
-            "header": [
-              { "key": "Accept", "value": "application/json" },
-              { "key": "Authorization", "value": "Bearer {{token}}" }
-            ],
-            "url": "{{base_url}}/admin/logout"
+            "method": "GET",
+            "header": [{ "key": "Accept", "value": "application/json" }],
+            "url": "{{base_url}}/testimonials?perPage=15"
+          }
+        },
+        {
+          "name": "List Clients",
+          "request": {
+            "method": "GET",
+            "header": [{ "key": "Accept", "value": "application/json" }],
+            "url": "{{base_url}}/clients?perPage=15"
+          }
+        },
+        {
+          "name": "List Team Members",
+          "request": {
+            "method": "GET",
+            "header": [{ "key": "Accept", "value": "application/json" }],
+            "url": "{{base_url}}/team-members?perPage=15"
           }
         }
       ]
     },
     {
-      "name": "Public — Properties",
+      "name": "Admin Features",
       "item": [
         {
-          "name": "List published properties",
-          "request": {
-            "method": "GET",
-            "header": [{ "key": "Accept", "value": "application/json" }],
-            "url": {
-              "raw": "{{base_url}}/properties?perPage=15&search=&type=&sort=sort_order&direction=asc&relations[]=images&relations[]=features",
-              "host": ["{{base_url}}"],
-              "path": ["properties"],
-              "query": [
-                { "key": "perPage", "value": "15" },
-                { "key": "search", "value": "" },
-                { "key": "type", "value": "" },
-                { "key": "bedrooms", "value": "", "disabled": true },
-                { "key": "bathrooms", "value": "", "disabled": true },
-                { "key": "sort", "value": "sort_order" },
-                { "key": "direction", "value": "asc" },
-                { "key": "relations[]", "value": "images" },
-                { "key": "relations[]", "value": "features" }
-              ]
-            }
-          }
-        },
-        {
-          "name": "Show published property",
-          "request": {
-            "method": "GET",
-            "header": [{ "key": "Accept", "value": "application/json" }],
-            "url": "{{base_url}}/properties/{{property_id}}"
-          }
-        }
-      ]
-    },
-    {
-      "name": "Admin — Properties",
-      "item": [
-        {
-          "name": "List all properties",
+          "name": "List",
           "request": {
             "method": "GET",
             "header": [
               { "key": "Accept", "value": "application/json" },
               { "key": "Authorization", "value": "Bearer {{token}}" }
             ],
-            "url": {
-              "raw": "{{base_url}}/admin/properties?perPage=15&is_published=&search=&sort=created_at&direction=desc&relations[]=images&relations[]=features",
-              "host": ["{{base_url}}"],
-              "path": ["admin", "properties"],
-              "query": [
-                { "key": "perPage", "value": "15" },
-                { "key": "is_published", "value": "" },
-                { "key": "search", "value": "" },
-                { "key": "type", "value": "", "disabled": true },
-                { "key": "sort", "value": "created_at" },
-                { "key": "direction", "value": "desc" },
-                { "key": "relations[]", "value": "images" },
-                { "key": "relations[]", "value": "features" }
-              ]
-            }
+            "url": "{{base_url}}/admin/features?perPage=50&search="
           }
         },
         {
-          "name": "Create property (JSON)",
-          "event": [
-            {
-              "listen": "test",
-              "script": {
-                "exec": [
-                  "if (pm.response.code === 201) {",
-                  "  const json = pm.response.json();",
-                  "  const id = json.data ? json.data.id : json.id;",
-                  "  if (id) pm.collectionVariables.set('property_id', String(id));",
-                  "}"
-                ]
-              }
+          "name": "Create",
+          "event": [{
+            "listen": "test",
+            "script": {
+              "exec": [
+                "const j = pm.response.json();",
+                "const id = j.data?.id ?? j.id;",
+                "if (id) pm.collectionVariables.set('feature_id', String(id));"
+              ]
             }
-          ],
+          }],
           "request": {
             "method": "POST",
             "header": [
@@ -155,55 +109,13 @@
             ],
             "body": {
               "mode": "raw",
-              "raw": "{\n  \"title\": {\n    \"en\": \"Seaside Serenity Villa\",\n    \"ar\": \"فيلا صفو البحر\"\n  },\n  \"description\": {\n    \"en\": \"A stunning 4-bedroom villa in a peaceful neighborhood.\",\n    \"ar\": \"فيلا رائعة من 4 غرف في حي هادئ.\"\n  },\n  \"location\": {\n    \"en\": \"Malibu, CA\",\n    \"ar\": \"ماليبو، كاليفورنيا\"\n  },\n  \"price\": 500000,\n  \"bedrooms\": 4,\n  \"bathrooms\": 3,\n  \"type\": \"Villa\",\n  \"is_published\": true,\n  \"sort_order\": 1,\n  \"feature_ids\": [1, 2]\n}"
+              "raw": "{\"name\":{\"en\":\"4-Bedroom\",\"ar\":\"4 غرف نوم\"}}"
             },
-            "url": "{{base_url}}/admin/properties"
+            "url": "{{base_url}}/admin/features"
           }
         },
         {
-          "name": "Create property (multipart + images)",
-          "request": {
-            "method": "POST",
-            "header": [
-              { "key": "Accept", "value": "application/json" },
-              { "key": "Authorization", "value": "Bearer {{token}}" }
-            ],
-            "body": {
-              "mode": "formdata",
-              "formdata": [
-                { "key": "title[en]", "value": "Metropolitan Haven", "type": "text" },
-                { "key": "title[ar]", "value": "ملاذ حضري", "type": "text" },
-                { "key": "description[en]", "value": "Chic 2-bedroom apartment with city views.", "type": "text" },
-                { "key": "description[ar]", "value": "شقة أنيقة من غرفتين بإطلالة على المدينة.", "type": "text" },
-                { "key": "location[en]", "value": "New York, NY", "type": "text" },
-                { "key": "location[ar]", "value": "نيويورك", "type": "text" },
-                { "key": "price", "value": "600000", "type": "text" },
-                { "key": "bedrooms", "value": "2", "type": "text" },
-                { "key": "bathrooms", "value": "2", "type": "text" },
-                { "key": "type", "value": "Apartment", "type": "text" },
-                { "key": "is_published", "value": "1", "type": "text" },
-                { "key": "feature_ids[]", "value": "1", "type": "text" },
-                { "key": "feature_ids[]", "value": "2", "type": "text" },
-                { "key": "images[]", "type": "file", "src": [] },
-                { "key": "images[]", "type": "file", "src": [] }
-              ]
-            },
-            "url": "{{base_url}}/admin/properties"
-          }
-        },
-        {
-          "name": "Show property",
-          "request": {
-            "method": "GET",
-            "header": [
-              { "key": "Accept", "value": "application/json" },
-              { "key": "Authorization", "value": "Bearer {{token}}" }
-            ],
-            "url": "{{base_url}}/admin/properties/{{property_id}}"
-          }
-        },
-        {
-          "name": "Update property (JSON)",
+          "name": "Update",
           "request": {
             "method": "PUT",
             "header": [
@@ -213,13 +125,125 @@
             ],
             "body": {
               "mode": "raw",
-              "raw": "{\n  \"title\": {\n    \"en\": \"Seaside Serenity Villa (Updated)\",\n    \"ar\": \"فيلا صفو البحر (محدث)\"\n  },\n  \"price\": 525000,\n  \"is_published\": true,\n  \"feature_ids\": [1, 2, 3]\n}"
+              "raw": "{\"name\":{\"en\":\"3-Bathroom\",\"ar\":\"3 حمامات\"}}"
             },
-            "url": "{{base_url}}/admin/properties/{{property_id}}"
+            "url": "{{base_url}}/admin/features/{{feature_id}}"
           }
         },
         {
-          "name": "Update property (multipart + new images)",
+          "name": "Delete",
+          "request": {
+            "method": "DELETE",
+            "header": [
+              { "key": "Accept", "value": "application/json" },
+              { "key": "Authorization", "value": "Bearer {{token}}" }
+            ],
+            "url": "{{base_url}}/admin/features/{{feature_id}}"
+          }
+        }
+      ]
+    },
+    {
+      "name": "Admin FAQs",
+      "item": [
+        {
+          "name": "List",
+          "request": {
+            "method": "GET",
+            "header": [
+              { "key": "Accept", "value": "application/json" },
+              { "key": "Authorization", "value": "Bearer {{token}}" }
+            ],
+            "url": "{{base_url}}/admin/faqs?perPage=15&is_published="
+          }
+        },
+        {
+          "name": "Create",
+          "event": [{
+            "listen": "test",
+            "script": {
+              "exec": [
+                "const j = pm.response.json();",
+                "const id = j.data?.id ?? j.id;",
+                "if (id) pm.collectionVariables.set('faq_id', String(id));"
+              ]
+            }
+          }],
+          "request": {
+            "method": "POST",
+            "header": [
+              { "key": "Accept", "value": "application/json" },
+              { "key": "Authorization", "value": "Bearer {{token}}" },
+              { "key": "Content-Type", "value": "application/json" }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"question\": {\"en\": \"How do I search?\", \"ar\": \"كيف أبحث؟\"},\n  \"answer\": {\"en\": \"Use the search tools.\", \"ar\": \"استخدم أدوات البحث.\"},\n  \"is_published\": true,\n  \"sort_order\": 1\n}"
+            },
+            "url": "{{base_url}}/admin/faqs"
+          }
+        },
+        {
+          "name": "Update",
+          "request": {
+            "method": "PUT",
+            "header": [
+              { "key": "Accept", "value": "application/json" },
+              { "key": "Authorization", "value": "Bearer {{token}}" },
+              { "key": "Content-Type", "value": "application/json" }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\"is_published\": false}"
+            },
+            "url": "{{base_url}}/admin/faqs/{{faq_id}}"
+          }
+        },
+        {
+          "name": "Delete",
+          "request": {
+            "method": "DELETE",
+            "header": [
+              { "key": "Accept", "value": "application/json" },
+              { "key": "Authorization", "value": "Bearer {{token}}" }
+            ],
+            "url": "{{base_url}}/admin/faqs/{{faq_id}}"
+          }
+        }
+      ]
+    },
+    {
+      "name": "Admin Testimonials",
+      "item": [
+        {
+          "name": "List",
+          "request": {
+            "method": "GET",
+            "header": [
+              { "key": "Accept", "value": "application/json" },
+              { "key": "Authorization", "value": "Bearer {{token}}" }
+            ],
+            "url": "{{base_url}}/admin/testimonials?perPage=15"
+          }
+        },
+        {
+          "name": "Create JSON",
+          "request": {
+            "method": "POST",
+            "header": [
+              { "key": "Accept", "value": "application/json" },
+              { "key": "Authorization", "value": "Bearer {{token}}" },
+              { "key": "Content-Type", "value": "application/json" }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"name\": {\"en\": \"Wade Warren\", \"ar\": \"ويد وارين\"},\n  \"title\": {\"en\": \"Exceptional Service!\", \"ar\": \"خدمة استثنائية!\"},\n  \"body\": {\"en\": \"Outstanding experience.\", \"ar\": \"تجربة رائعة.\"},\n  \"location\": {\"en\": \"USA, California\", \"ar\": \"أمريكا، كاليفورنيا\"},\n  \"rating\": 5,\n  \"is_published\": true\n}"
+            },
+            "url": "{{base_url}}/admin/testimonials"
+          }
+        },
+        {
+          "name": "Create multipart + avatar",
           "request": {
             "method": "POST",
             "header": [
@@ -229,51 +253,120 @@
             "body": {
               "mode": "formdata",
               "formdata": [
-                { "key": "_method", "value": "PUT", "type": "text" },
-                { "key": "price", "value": "530000", "type": "text" },
+                { "key": "name[en]", "value": "John Mans", "type": "text" },
+                { "key": "name[ar]", "value": "جون مانز", "type": "text" },
+                { "key": "title[en]", "value": "Efficient and Reliable", "type": "text" },
+                { "key": "title[ar]", "value": "كفء وموثوق", "type": "text" },
+                { "key": "body[en]", "value": "Top-notch service.", "type": "text" },
+                { "key": "body[ar]", "value": "خدمة ممتازة.", "type": "text" },
+                { "key": "rating", "value": "5", "type": "text" },
                 { "key": "is_published", "value": "1", "type": "text" },
-                { "key": "images[]", "type": "file", "src": [] }
+                { "key": "avatar", "type": "file", "src": [] }
               ]
             },
-            "url": "{{base_url}}/admin/properties/{{property_id}}"
+            "url": "{{base_url}}/admin/testimonials"
           }
         },
         {
-          "name": "Delete property",
+          "name": "Delete",
           "request": {
             "method": "DELETE",
             "header": [
               { "key": "Accept", "value": "application/json" },
               { "key": "Authorization", "value": "Bearer {{token}}" }
             ],
-            "url": "{{base_url}}/admin/properties/{{property_id}}"
+            "url": "{{base_url}}/admin/testimonials/{{testimonial_id}}"
           }
         }
       ]
     },
     {
-      "name": "Admin — Property Images",
+      "name": "Admin Clients",
       "item": [
         {
-          "name": "Set primary image",
+          "name": "List",
+          "request": {
+            "method": "GET",
+            "header": [
+              { "key": "Accept", "value": "application/json" },
+              { "key": "Authorization", "value": "Bearer {{token}}" }
+            ],
+            "url": "{{base_url}}/admin/clients"
+          }
+        },
+        {
+          "name": "Create multipart",
           "request": {
             "method": "POST",
             "header": [
               { "key": "Accept", "value": "application/json" },
               { "key": "Authorization", "value": "Bearer {{token}}" }
             ],
-            "url": "{{base_url}}/admin/property-images/{{image_id}}/primary"
+            "body": {
+              "mode": "formdata",
+              "formdata": [
+                { "key": "name[en]", "value": "Acme Corp", "type": "text" },
+                { "key": "name[ar]", "value": "أكمي", "type": "text" },
+                { "key": "website_url", "value": "https://example.com", "type": "text" },
+                { "key": "is_published", "value": "1", "type": "text" },
+                { "key": "logo", "type": "file", "src": [] }
+              ]
+            },
+            "url": "{{base_url}}/admin/clients"
           }
         },
         {
-          "name": "Delete image",
+          "name": "Delete",
           "request": {
             "method": "DELETE",
             "header": [
               { "key": "Accept", "value": "application/json" },
               { "key": "Authorization", "value": "Bearer {{token}}" }
             ],
-            "url": "{{base_url}}/admin/property-images/{{image_id}}"
+            "url": "{{base_url}}/admin/clients/{{client_id}}"
+          }
+        }
+      ]
+    },
+    {
+      "name": "Admin Team Members",
+      "item": [
+        {
+          "name": "List",
+          "request": {
+            "method": "GET",
+            "header": [
+              { "key": "Accept", "value": "application/json" },
+              { "key": "Authorization", "value": "Bearer {{token}}" }
+            ],
+            "url": "{{base_url}}/admin/team-members"
+          }
+        },
+        {
+          "name": "Create",
+          "request": {
+            "method": "POST",
+            "header": [
+              { "key": "Accept", "value": "application/json" },
+              { "key": "Authorization", "value": "Bearer {{token}}" },
+              { "key": "Content-Type", "value": "application/json" }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"name\": {\"en\": \"Sarah Bell\", \"ar\": \"سارة بيل\"},\n  \"role\": {\"en\": \"CEO\", \"ar\": \"المديرة التنفيذية\"},\n  \"bio\": {\"en\": \"Leader in real estate.\", \"ar\": \"قائدة في العقارات.\"},\n  \"is_published\": true\n}"
+            },
+            "url": "{{base_url}}/admin/team-members"
+          }
+        },
+        {
+          "name": "Delete",
+          "request": {
+            "method": "DELETE",
+            "header": [
+              { "key": "Accept", "value": "application/json" },
+              { "key": "Authorization", "value": "Bearer {{token}}" }
+            ],
+            "url": "{{base_url}}/admin/team-members/{{team_member_id}}"
           }
         }
       ]
